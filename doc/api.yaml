@@ -1,0 +1,802 @@
+openapi: 3.0.3
+servers:
+  - url: http://localhost:3000
+    description: Local server
+info:
+  title: WASAPhoto API
+  version: 1.0.0
+tags:
+  - name: login
+    description: Login operations
+  - name: Upload photo
+    description: Upload photo operations
+  - name: Update Username
+    description: Update Username operations
+  - name: Get Profile
+    description: Get User Profile operations
+  - name: Search User
+    description: Search User operations
+  - name: Delete photo
+    description: Delete photo operations
+  - name: Get Stream
+    description: Get User Stream operations
+  - name: Follow User
+    description: Follow User operations
+  - name: Unfollow an user
+    description: Unfollow an user operations
+  - name: Ban an user
+    description: Ban an user operations
+  - name: Unban an user
+    description: Unban an user operations
+  - name: Like a photo
+    description: Like a photo operations
+  - name: Unlike a photo
+    description: Unlike a photo operations
+  - name: Comment a photo
+    description: Comment a photo operations
+  - name: Uncomment a photo
+    description: Uncomment a photo operations
+paths:
+  /session:
+    post:
+      tags:
+        - login
+      operationId: doLogin
+      summary: Logs in the user
+      description: >-
+        If the user does not exist it will be created and an identifier is
+        returned. If the user exists the user identifier is returned.
+      requestBody:
+        description: User details
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/user_name"}
+        required: true
+      responses:
+        "201":
+          description: User log-in action successfull
+          content:
+            application/json:
+              schema:
+                description: userName identifier
+                type: object
+                properties:
+                  identifier:
+                    description: User identifier
+                    type: integer
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "401": {$ref: '#/components/responses/Unauthorized'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+      security:
+        - HTTPBearerAuth: []
+
+  /user/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+    post:
+      tags: 
+        - Upload photo
+      operationId: uploadPhoto
+      summary: Upload Photo
+      description: |
+        The user with id {id} is uploading a photo
+      requestBody: 
+        content: 
+          multipart/form-data: 
+            schema: {$ref: '#/components/schemas/photo_post'}
+      responses:
+        "201": 
+           description: Photo uploaded successfully.
+           content: 
+             multipart/form-data: 
+               schema: {$ref: '#/components/schemas/photo_post'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+
+    put:
+      tags: 
+        - Update Username
+      operationId: setMyUserName
+      summary:  Update UserName
+      description: | 
+         Update the username of a specific user by its ID
+      requestBody: 
+        required: true
+        content:
+          application/json: 
+           schema: {$ref: '#/components/schemas/user_name'}
+      responses:
+        "201": 
+           description: UserName updated successfully.
+           content: 
+              application/json: 
+                schema: {$ref: '#/components/schemas/user_name'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+    
+
+  /users/{id}/profile/{profileid}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+    
+    - name: profileid
+      in: path
+      required: true
+      description: this is the user id that the main user wants to get the profile
+      schema:
+        type: integer
+        description: e.g., /user/1234/profile/1357
+    get:
+      tags: 
+        - Get Profile
+      operationId: getUserProfile
+      summary: Get Profile
+      description: |
+        Get the profile of a specified user by its ID
+      responses: 
+        "200":
+          description: Get an object profile by the ID
+          content:
+            application/json: 
+              schema: {$ref: '#/components/schemas/user_profile'} 
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'} 
+      security:
+        - HTTPBearerAuth: []
+
+
+  /user/profile/{uid}/search/{search}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+    
+    - name: search
+      in: path
+      required: true
+      description: this is the user id that the main user wants to search
+      schema:
+        type: string
+        minLength: 0 
+        maxLength: 50
+        pattern: ^.*?$
+        description: e.g., /user/1234/search/luca
+
+    get:
+      tags: 
+        - Search User
+      operationId: searchUser
+      summary: Search User
+      description: |
+        The user {uid} wants to search the user {search}
+      responses:
+        "200":
+          description: User {search} found
+          content: 
+            application/json: 
+              schema: {$ref: '#/components/schemas/list_of_users'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+
+
+  /user/{uid}/photos/{photoid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+
+    - name: photoid
+      in: path
+      required: true
+      description: this is the photo id that the main user wants to delete
+      schema:
+        type: integer
+        description: e.g., /user/1234/photos/1357
+    
+    post:
+      tags:
+        - Comment a photo
+      operationId: commentPhoto
+      summary: Comment a photo
+      description: |
+        The user {uid} wants to comment the photo {photoid}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: The user need to insert the comment that he want to post
+              type: object
+              properties:
+                text:
+                  description: Comment text
+                  type: string
+                  minLength: 3
+                  maxLength: 300
+                  pattern: ^.*?$
+      responses:
+        "201":
+          description: User {uid} has commented the photo {photoid}
+          content: 
+            application/json: 
+              schema:
+                description: object for comment information 
+                type: object
+                properties:
+                  status:
+                    description: Status of the opeartion
+                    type: string
+                    minLength: 3
+                    maxLength: 20
+                  message:
+                    description: Message of the operation
+                    type: string
+                    minLength: 3
+                    maxLength: 20
+                  data: {$ref: '#/components/schemas/object_comment'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+
+    delete:
+      tags: 
+        - Delete photo
+      operationId: deletePhoto
+      summary: Delete a photo
+      description: |
+        The user {uid} wants to delete a photo
+      responses: 
+        "204":
+          description: Photo deleted successfully
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+    
+  /user/stream/{uid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+    get:
+      tags: 
+        - Get Stream
+      operationId: getMyStream
+      summary: Get stream of photo
+      description: |
+        Get Stream of photo based on the users that {uid} is following
+      responses: 
+        "200":
+          description: Stream of user {uid} obtained
+          content: 
+            application/json: 
+              schema: {$ref: '#/components/schemas/stream_of_photo'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+      security:
+        - HTTPBearerAuth: []
+
+
+  /user/{uid}/follow/{fluid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+
+    - name: fluid
+      in: path
+      required: true
+      description: this is the user id that the main user wants to follow or unfollow
+      schema:
+        type: integer
+        description: e.g., /user/1234/follow/1357
+    
+    put:
+      tags: 
+        - Follow User
+      operationId: followUser
+      summary: Follow an user
+      description: |
+        The user {uid} wants to follow the user {fluid}
+      responses:
+        "201":
+          description: User {uid} is now following user {fluid}
+          content: 
+            application/json: 
+              schema:
+                description: object for comment information
+                type: object
+                properties:
+                  status:
+                    description: Status of the opeartion
+                    type: string
+                    minLength: 3
+                    maxLength: 20
+                  message:
+                    description: Message of the operation
+                    type: string
+                    minLength: 3
+                    maxLength: 50
+                  data: {$ref: '#/components/schemas/object_followed'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+
+    delete:
+      tags: 
+        - Unfollow an user
+      operationId: unfollowUser
+      summary: Unfollow an user
+      description: |
+        The user {uid} wants to unfollow the user {fluid}
+      responses:
+        "204":
+          description: User {uid} is not following anymore user {fluid}
+
+      security:
+        - HTTPBearerAuth: []
+    
+  /users/{uid}/follows/{fluid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+
+    - name: fluid
+      in: path
+      required: true
+      description: this is the user id that the main user wants to check if he is following
+      schema:
+        type: integer
+        description: e.g., /user/1234/follow/1357
+    
+    get:
+      tags: 
+        - Get Followers
+      operationId: checkFollower
+      summary: check Follower
+      description: |
+        Get the object profile of the follower if the user {uid} is following the user {fluid}
+      responses: 
+        "200":
+          description: Get an object profile by the ID
+          content:
+            application/json: 
+              schema:
+               description: boolean value that indicates if the user {uid} is following the user {fluid}
+               type: boolean
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'} 
+      security:
+        - HTTPBearerAuth: []
+
+  /user/{uid}/ban/{banuid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+
+    - name: banuid
+      in: path
+      required: true
+      description: this is the user id that the main user wants to ban or unban
+      schema:
+        type: integer
+        description: e.g., /user/1234/ban/1357
+    
+    post:
+      tags: 
+        - Ban an user
+      operationId: banUser
+      summary: Ban an user
+      description: |
+        The user {uid} wants to ban the user {banuid}
+      responses:
+        "201":
+          description: User {banuid} has been banned from user {uid}
+          content: 
+            application/json: 
+              schema:
+                description: object for ban information
+                type: object
+                properties:
+                  status:
+                    description: Status of the opeartion
+                    type: string
+                    minLength: 3
+                    maxLength: 20
+                  message:
+                    description: Message of the operation
+                    type: string
+                    minLength: 3
+                    maxLength: 50
+                  data: {$ref: '#/components/schemas/object_banned'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+      
+      security:
+        - HTTPBearerAuth: []
+
+    delete:
+      tags: 
+        - Unban an user
+      operationId: unbanUser
+      summary: Unban an user
+      description: |
+        The user {uid} wants to unban the user {fluid}
+      responses:
+        "204":
+          description: User {banuid} has been unbanned from user {uid}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+      
+      security:
+        - HTTPBearerAuth: []
+
+  /users/{uid}/bans/{banuid}:
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        description: this is the user id
+        schema:
+          type: integer
+          description: e.g., /user/1234
+      
+      - name: banuid
+        in: path
+        required: true
+        description: this is the user id that the main user wants to check if he is banned
+        schema:
+          type: integer
+          description: e.g., /user/1234/ban/1357
+      
+    get:
+      tags: 
+        - Get Banned
+      operationId: checkBanned
+      summary: check Banned
+      description: |
+        Get the object profile of the banned user if the user {uid} has banned the user {banuid}
+      responses: 
+        "200":
+          description: Get an object profile by the ID
+          content:
+            application/json: 
+              schema:
+               description: boolean value that indicates if the user {uid} has banned the user {banuid}
+               type: boolean
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'} 
+      security:
+        - HTTPBearerAuth: []
+
+    
+  /user/{uid}/likes/{photoid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+
+    - name: photoid
+      in: path
+      required: true
+      description: this is the photo id that the main user wants to like or unlike
+      schema:
+        type: integer
+        description: e.g., /user/1234/photos/1357/like
+    
+    post:
+      tags:
+        - Like a photo
+      operationId: likePhoto
+      summary: Like a photo
+      description: |
+        The user {uid} wants to like the photo {photoid}
+      responses:
+        "201":
+          description: User {uid} has liked the photo {photoid}
+          content:
+            application/json: 
+              schema:
+                description: object for the liked photo
+                type: object
+                properties:
+                  status:
+                    description: Status of the opeartion
+                    type: string
+                    minLength: 3
+                    maxLength: 20
+                  message:
+                    description: Message of the operation
+                    type: string
+                    minLength: 3
+                    maxLength: 20
+                  data: {$ref: '#/components/schemas/object_liked'}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+
+      security:
+        - HTTPBearerAuth: []
+
+    delete:
+      tags: 
+        - Unlike a photo
+      operationId: unlikePhoto
+      summary: Unlike a photo
+      description: |
+        The user {uid} wants to unlike the photo {photoid}
+      responses:
+        "204":
+          description: User {uid} has unliked the photo {photoid}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+      
+      security:
+        - HTTPBearerAuth: []
+      
+  /user/{uid}/photos/{photoid}/comment/{commentid}:
+    parameters:
+    - name: uid
+      in: path
+      required: true
+      description: this is the user id
+      schema:
+        type: integer
+        description: e.g., /user/1234
+
+    - name: photoid
+      in: path
+      required: true
+      description: this is the photo id that the main user wants to comment or uncomment
+      schema:
+        type: integer
+        description: e.g., /user/1234/comment/1357
+
+    - name: commentid
+      in: path
+      required: true
+      description: this is the comment id that the main user wants to uncomment
+      schema:
+        type: integer
+        description: e.g., /user/1234/photos/1357/comment/2468
+
+    delete:
+      tags: 
+        - Uncomment a photo
+      operationId: uncommentPhoto
+      summary: Uncomment a photo
+      description: |
+        The user {uid} wants to uncomment the photo {photoid}
+      responses:
+        "204":
+          description: User {uid} has uncommented the comment {commentid} of the photo {photoid}
+        "400": {$ref: '#/components/responses/BadRequest'}
+        "500": {$ref: '#/components/responses/InternalServerError'}
+      
+      security:
+        - HTTPBearerAuth: []
+    
+components:
+
+  responses:
+    Unauthorized:
+      description: The client provides no credentials or invalid credentials
+    BadRequest:
+      description: The request was not compliant with the documentation (eg. missing fields, etc)
+    InternalServerError:
+      description: The server encountered an internal error. Further info in server logs
+
+
+  securitySchemes: 
+    HTTPBearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+   
+   user_name:
+      description: userName object schema
+      type: object
+      properties:
+        name:
+          description: User name structure
+          type: string
+          example: Vincenzo
+          pattern: ^.*?$
+          minLength: 3
+          maxLength: 16
+
+   user_profile:
+    description: User profile object schema
+    type: object
+    properties: 
+      user_id:
+        description: User identifier
+        type: integer
+      user_name:
+        $ref: '#/components/schemas/user_name'
+      photo_counter:
+        description: Number of photos
+        type: integer
+        minimum: 0
+      num_follower:
+        description: Number of followers
+        type: integer
+        minimum: 0
+      num_following:
+        description: Number of followed users
+        type: integer
+        minimum: 0
+      
+   photo_post:
+      description: object for photo information 
+      type: object
+      properties:
+        id:
+          description: Photo identifier
+          type: integer
+        photo:
+          $ref: '#/components/schemas/object_photo'
+        date_upload:
+          description: Photo upload date
+          type: string
+          format: date-time
+          minLength: 19
+          maxLength: 19
+        num_like:
+          description: Number of like
+          type: integer
+          minimum: 0
+        num_comment:
+          description: Number of comment
+          type: integer
+          minimum: 0
+
+   object_photo:
+    description: object photo
+    type: string
+    format: binary
+    minLength: 0
+    maxLength: 3000000
+
+   object_comment:
+      description: object for comment information
+      type: object
+      properties:
+        commentId:
+          description: Comment identifier
+          type: integer
+        text:
+          description: Comment text
+          type: string
+          minLength: 3
+          maxLength: 300
+        userId:
+          description: User identifier
+          type: integer
+
+   object_followed:
+      description: object for followed user
+      type: object
+      properties:
+        followerId:
+           description: User identifier
+           type: integer
+        followingId:
+           description: Followed user identifier
+           type: integer
+      
+   object_banned:
+        description: object for banned user
+        type: object
+        properties:
+          userId:
+            description: User identifier
+            type: integer
+          bannedId:
+            description: Banned user identifier
+            type: integer
+
+   object_liked:
+      description: object for liked photo
+      type: object
+      properties:
+        photoId:
+          description: Photo identifier
+          type: integer
+        Num_like:
+          description: Number of likes
+          type: integer
+
+   stream_of_photo:
+    description: object for the stream of photo
+    type: array
+    minItems: 1
+    maxItems: 200
+    items:
+      type: object
+      properties: 
+        imageId:
+          description: Photo identifier
+          type: integer
+          pattern: ^.*?$
+          readOnly: true
+        imageUrl:
+          $ref: '#/components/schemas/object_photo'
+        date_upload:
+          description: Photo upload date
+          type: string
+          format: date-time
+        num_like:
+          description: Number of like
+          type: integer
+          minimum: 0
+        num_comment:
+          description: Number of comment
+          type: integer
+          minimum: 0
+      required: [imageId,imageUrl,date_upload,num_like,num_comment]
+
+   list_of_users:
+    description: object for the list of users
+    type: array
+    minItems: 1
+    maxItems: 200
+    items:
+      $ref: '#/components/schemas/user_profile'
+        
