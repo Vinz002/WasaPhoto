@@ -28,7 +28,7 @@ export default {
     document.addEventListener('click', this.closeAutocompleteList);
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     // Rimuove il gestore di eventi quando il componente viene distrutto per evitare memory leaks
     document.removeEventListener('click', this.closeAutocompleteList);
   },
