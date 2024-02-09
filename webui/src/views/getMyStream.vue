@@ -430,17 +430,7 @@ export default {
         });
 
         if (checkLikeResponse.data === true){
-          const response = await this.$axios.delete(`${this.$url}/user/${this.userId}/likes/${photo.Id}`, {
-            headers: {
-              Authorization: 'Bearer ' + this.userId,
-            },
-          });
-
-          if (response.status === 204) {
-            await this.getMyStream();
-          } else {
-            console.error('Error liking photo:', response.status, response.data);
-          }
+          this.unlikePhoto(photo);
         } else {
           const response = await this.$axios.post(`${this.$url}/user/${this.userId}/likes/${photo.Id}`, null, {
             headers: {
@@ -456,6 +446,24 @@ export default {
         }
       } catch (error) {
         console.error('Error liking photo:', error);
+      }
+    },
+
+    async unlikePhoto(photo){
+      try {
+        const response = await this.$axios.delete(`${this.$url}/user/${this.userId}/likes/${photo.Id}`, {
+            headers: {
+              Authorization: 'Bearer ' + this.userId,
+            },
+          });
+
+        if (response.status === 204) {
+          await this.getMyStream();
+        } else {
+          console.error('Error deleting like:', response.status, response.data);
+        }
+      } catch (error) {
+        console.error('Error deleting like:', error);
       }
     },
 
