@@ -1,5 +1,4 @@
 <script>
-const apiUrl = 'http://localhost:3000';
 
 export default {
   data: function () {
@@ -37,7 +36,7 @@ export default {
 
     async searchUser() {
       try {
-        const response = await this.$axios.get(`${apiUrl}/user/profile/${this.userId}/search/${this.searchUsername}`, {
+        const response = await this.$axios.get(`${this.$url}/user/profile/${this.userId}/search/${this.searchUsername}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
@@ -66,7 +65,7 @@ export default {
         return;
       }
 
-      const response = await this.$axios.get(`${apiUrl}/user/profile/${this.userId}/search/${this.searchUsername}`, {
+      const response = await this.$axios.get(`${this.$url}/user/profile/${this.userId}/search/${this.searchUsername}`, {
         headers: {
           Authorization: 'Bearer ' + this.userId
         }
@@ -104,7 +103,7 @@ export default {
 
     async followUser() {
       try {
-        const followResponse = await this.$axios.put(`${apiUrl}/user/${this.userId}/follow/${this.profileId}`, null,{
+        const followResponse = await this.$axios.put(`${this.$url}/user/${this.userId}/follow/${this.profileId}`, null,{
           headers: {
             Authorization: 'Bearer ' + this.userId
           }
@@ -121,7 +120,7 @@ export default {
 
     async unfollowUser() {
       try {
-        const unfollowResponse = await this.$axios.delete(`${apiUrl}/user/${this.userId}/follow/${this.profileId}`, {
+        const unfollowResponse = await this.$axios.delete(`${this.$url}/user/${this.userId}/follow/${this.profileId}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId
           }
@@ -139,7 +138,7 @@ export default {
     async banUser() {
      try {
         // Chiamata API per bannare l'utente
-       const banresponse = await this.$axios.post(`${apiUrl}/user/${this.userId}/ban/${this.profileId}`, null, {
+       const banresponse = await this.$axios.post(`${this.$url}/user/${this.userId}/ban/${this.profileId}`, null, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
@@ -158,7 +157,7 @@ export default {
     async unbanUser() {
       try {
         // Chiamata API per sbannare l'utente
-        const unbanresp = await this.$axios.delete(`${apiUrl}/user/${this.userId}/ban/${this.profileId}`, {
+        const unbanresp = await this.$axios.delete(`${this.$url}/user/${this.userId}/ban/${this.profileId}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
@@ -175,7 +174,7 @@ export default {
 
     async fetchUserProfile() {
       try {
-      const response = await this.$axios.get(`${apiUrl}/users/${this.userId}/profile/${this.profileId}`, {
+      const response = await this.$axios.get(`${this.$url}/users/${this.userId}/profile/${this.profileId}`, {
         headers: {
           Authorization: 'Bearer ' + this.userId
         }
@@ -191,7 +190,7 @@ export default {
       if (this.userId === this.profileId) {
         this.isCurrentUser = true;
       } else {
-        const bancheck = await this.$axios.get(`${apiUrl}/users/${this.userId}/bans/${this.profileId}`, {
+        const bancheck = await this.$axios.get(`${this.$url}/users/${this.userId}/bans/${this.profileId}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
@@ -200,7 +199,7 @@ export default {
         console.log(bancheck.data);
         if (!bancheck.data) {
             this.IsBanned = false;
-            const followStatusResponse = await this.$axios.get(`${apiUrl}/users/${this.userId}/follows/${this.profileId}`, {
+            const followStatusResponse = await this.$axios.get(`${this.$url}/users/${this.userId}/follows/${this.profileId}`, {
               headers: {
                 Authorization: 'Bearer ' + this.userId,
               },
@@ -257,7 +256,7 @@ export default {
         console.log(formData)
 
         // Effettua la chiamata al backend per caricare la foto
-        const response = await this.$axios.post(`${apiUrl}/user/${this.userId}`, formData, {
+        const response = await this.$axios.post(`${this.$url}/user/${this.userId}`, formData, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
             'Content-Type': 'multipart/form-data',
@@ -300,7 +299,7 @@ export default {
         this.selectedPhoto = photo;
         this.loadingComments = true;
         try {
-          const commentsResponse = await this.$axios.get(`${apiUrl}/photos/${photo.Id}/comments`, {
+          const commentsResponse = await this.$axios.get(`${this.$url}/photos/${photo.Id}/comments`, {
             headers: {
               Authorization: 'Bearer ' + this.userId,
             },
@@ -320,7 +319,7 @@ export default {
 
     async deletePhoto(photo) {
       try {
-        const response = await this.$axios.delete(`${apiUrl}/user/${this.userId}/photos/${photo.Id}`, {
+        const response = await this.$axios.delete(`${this.$url}/user/${this.userId}/photos/${photo.Id}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
@@ -362,7 +361,7 @@ export default {
 
     async deleteComment(comment) {
       try {
-        const response = await this.$axios.delete(`${apiUrl}/user/${this.userId}/photos/${comment.PhotoId}/comment/${comment.Id}`, {
+        const response = await this.$axios.delete(`${this.$url}/user/${this.userId}/photos/${comment.PhotoId}/comment/${comment.Id}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
@@ -380,14 +379,14 @@ export default {
 
     async likePhoto(photo) {
       try {
-        const checkLikeResponse = await this.$axios.get(`${apiUrl}/users/${this.userId}/likes/${photo.Id}`, {
+        const checkLikeResponse = await this.$axios.get(`${this.$url}/users/${this.userId}/likes/${photo.Id}`, {
           headers: {
             Authorization: 'Bearer ' + this.userId,
           },
         });
 
         if (checkLikeResponse.data === true){
-          const response = await this.$axios.delete(`${apiUrl}/user/${this.userId}/likes/${photo.Id}`, {
+          const response = await this.$axios.delete(`${this.$url}/user/${this.userId}/likes/${photo.Id}`, {
             headers: {
               Authorization: 'Bearer ' + this.userId,
             },
@@ -399,7 +398,7 @@ export default {
             console.error('Error liking photo:', response.status, response.data);
           }
         } else {
-          const response = await this.$axios.post(`${apiUrl}/user/${this.userId}/likes/${photo.Id}`, null, {
+          const response = await this.$axios.post(`${this.$url}/user/${this.userId}/likes/${photo.Id}`, null, {
             headers: {
               Authorization: 'Bearer ' + this.userId
             },
