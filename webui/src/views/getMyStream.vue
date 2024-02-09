@@ -155,7 +155,7 @@ export default {
 
         if (followResponse.status === 201) {
           this.isFollowing = true;
-          await this.fetchUserProfile();
+          await this.getUserProfile();
         }
       } catch (error) {
         console.error('Error following user:', error);
@@ -172,7 +172,7 @@ export default {
 
         if (unfollowResponse.status === 204) {
           this.isFollowing = false;
-          await this.fetchUserProfile();
+          await this.getUserProfile();
         }
       } catch (error) {
         console.error('Error unfollowing user:', error);
@@ -191,7 +191,7 @@ export default {
         if(banresponse.status === 201) {
           this.IsBanned = true;
           this.isFollowing = false; 
-          await this.fetchUserProfile();
+          await this.getUserProfilele();
         }
       } catch (error) {
         console.error('Error banning user:', error);
@@ -209,14 +209,14 @@ export default {
 
         if(unbanresp.status === 204) {
           this.IsBanned = false;
-          await this.fetchUserProfile();
+          await this.getUserProfile();
         }
       } catch (error) {
         console.error('Error unbanning user:', error);
       }
     },
 
-    async fetchUserProfile() {
+    async getUserProfile() {
       try {
       const response = await this.$axios.get(`${this.$url}/users/${this.userId}/profile/${this.profileId}`, {
         headers: {
@@ -272,7 +272,7 @@ export default {
         this.userId = newUserId;
         this.profileId = newProfileId;
         this.isCurrentUser = newUserId === newProfileId;
-        await this.fetchUserProfile();
+        await this.getUserProfile();
       }
     },
 
@@ -311,7 +311,7 @@ export default {
         // Verifica lo stato della risposta
         if (response.status === 201) {
           // Ricarica il profilo utente
-          await this.fetchUserProfile();
+          await this.getUserProfile();
         } else {
           console.error('Error uploading photo:', response.status, response.data);
         }
@@ -370,7 +370,7 @@ export default {
         });
 
         if (response.status === 204) {
-          await this.fetchUserStream();
+          await this.getMyStream();
         } else {
           console.error('Error deleting photo:', response.status, response.data);
         }
@@ -392,7 +392,7 @@ export default {
         );
 
         if (response.status === 201) {
-          await this.fetchUserStream();
+          await this.getMyStream();
           // await this.toggleComments(photo);
           this.newCommentText = '';
         } else {
@@ -412,7 +412,7 @@ export default {
         });
 
         if (response.status === 204) {
-          await this.fetchUserStream();
+          await this.getMyStream();
         } else {
           console.error('Error deleting comment:', response.status, response.data);
         }
@@ -437,7 +437,7 @@ export default {
           });
 
           if (response.status === 204) {
-            await this.fetchUserStream();
+            await this.getMyStream();
           } else {
             console.error('Error liking photo:', response.status, response.data);
           }
@@ -449,7 +449,7 @@ export default {
           });
 
           if (response.status === 201) {
-            await this.fetchUserStream();
+            await this.getMyStream();
           } else {
             console.error('Error liking photo:', response.status, response.data);
           }
@@ -459,7 +459,7 @@ export default {
       }
     },
 
-    async fetchUserStream() {
+    async getMyStream() {
       try {
         const response = await this.$axios.get(`${this.$url}/user/stream/${this.userId}`, {
           headers: {
