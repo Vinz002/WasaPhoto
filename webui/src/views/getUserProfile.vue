@@ -292,7 +292,7 @@ export default {
     },
 
       
-  async toggleComments(photo) {
+  async getComments(photo) {
       if (this.selectedPhoto === photo) {
         this.selectedPhoto = null;
       } else {
@@ -335,7 +335,7 @@ export default {
       }
     },
 
-    async addNewComment(photo) {
+    async commentPhoto(photo) {
       try {
         // Effettua una chiamata API per aggiungere un nuovo commento
         const response = await this.$axios.post(
@@ -349,7 +349,7 @@ export default {
 
         if (response.status === 201) {
           await this.fetchUserProfile();
-          await this.toggleComments(photo);
+          // await this.getComments(photo);
           this.newCommentText = '';
         } else {
           console.error('Error adding new comment:', response.status, response.data);
@@ -465,7 +465,7 @@ export default {
                 <span class="like-counter">{{ photo.NumLikes }}</span>
               </div>
                 <div class="comments-section">
-                  <span class="comment-icon" @click="toggleComments(photo)">💬</span>
+                  <span class="comment-icon" @click="getComments(photo)">💬</span>
                   <span class="comment-counter">{{ photo.NumComments }}</span>
                   <div v-if="!loadingComments && selectedPhoto && selectedPhoto === photo" class="comment-list-container">
                     <div v-for="comment in selectedPhoto.Comments" :key="comment.Id" class="comment">
@@ -475,7 +475,7 @@ export default {
                     </div>
                     <div class="new-comment-container">
                       <textarea v-model="newCommentText" placeholder="Inserisci un nuovo commento"></textarea>
-                      <button @click="addNewComment(photo)">Invia</button>
+                      <button @click="commentPhoto(photo)">Invia</button>
                     </div>
                   </div>
                 </div>
