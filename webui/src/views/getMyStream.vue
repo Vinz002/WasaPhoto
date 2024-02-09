@@ -287,11 +287,11 @@ export default {
       const selectedFile = fileInput.files[0];
 
       if (selectedFile) {
-        this.uploadFile(selectedFile);
+        this.uploadPhoto(selectedFile);
       }
     },
 
-  async uploadFile(file) {
+  async uploadPhoto(file) {
       try {
         // Usa FormData per inviare il file al backend
         console.log(file)
