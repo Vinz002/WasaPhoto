@@ -2,7 +2,6 @@
 <script setup>
 </script>
 <script>
-const apiUrl = 'http://localhost:3000';
 export default {
     data:
      function(){
