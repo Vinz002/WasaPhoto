@@ -359,7 +359,7 @@ export default {
       }
     },
 
-    async deleteComment(comment) {
+    async uncommentPhoto(comment) {
       try {
         const response = await this.$axios.delete(`${this.$url}/user/${this.userId}/photos/${comment.PhotoId}/comment/${comment.Id}`, {
           headers: {
@@ -471,7 +471,7 @@ export default {
                     <div v-for="comment in selectedPhoto.Comments" :key="comment.Id" class="comment">
                       <span class="comment-author">{{ comment.Username }}</span>
                       {{ comment.Comment }}
-                      <button v-if="comment.UserID == this.userId" @click="deleteComment(comment)" class="btn btn-danger btn-sm btn-delete" title="Elimina il tuo commento">X</button>
+                      <button v-if="comment.UserID == this.userId" @click="uncommentPhoto(comment)" class="btn btn-danger btn-sm btn-delete" title="Elimina il tuo commento">X</button>
                     </div>
                     <div class="new-comment-container">
                       <textarea v-model="newCommentText" placeholder="Inserisci un nuovo commento"></textarea>
