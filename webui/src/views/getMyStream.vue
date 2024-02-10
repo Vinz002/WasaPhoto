@@ -46,13 +46,9 @@ export default {
         const bancheck = await this.checkBanned();
         if (!bancheck) {
             this.IsBanned = false;
-            const followStatusResponse = await this.$axios.get(`${this.$url}/users/${this.userId}/follows/${this.profileId}`, {
-              headers: {
-                Authorization: 'Bearer ' + this.userId,
-              },
-           });
+            const followStatusResponse = await this.checkFollower();
 
-            if (followStatusResponse.status === 200 && followStatusResponse.data === true) {
+            if (followStatusResponse) {
               this.isFollowing = true;
             }
           } else {
@@ -136,6 +132,23 @@ export default {
       catch (error) {
         console.error('Error checking ban:', error);
       }
+    },
+
+    async checkFollower(){
+      try {
+        const response = await this.$axios.get(`${this.$url}/users/${this.userId}/follows/${this.profileId}`, {
+          headers: { Authorization: 'Bearer ' + this.userId },
+        });
+        console.log(response.data);
+        if(response.data === true){
+          return true;
+        }
+        return false;
+      }
+      catch (error) {
+        console.error('Error checking follower:', error);
+      }
+
     },
 
     async goToUserProfile(selectedUserId) {
