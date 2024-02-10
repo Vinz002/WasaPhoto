@@ -47,7 +47,6 @@ export default {
         if (!bancheck) {
             this.IsBanned = false;
             const followStatusResponse = await this.checkFollower();
-
             if (followStatusResponse) {
               this.isFollowing = true;
             }
