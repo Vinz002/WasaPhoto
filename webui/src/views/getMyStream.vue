@@ -423,14 +423,10 @@ export default {
 
     async likePhoto(photo) {
       try {
-        const checkLikeResponse = await this.$axios.get(`${this.$url}/users/${this.userId}/likes/${photo.Id}`, {
-          headers: {
-            Authorization: 'Bearer ' + this.userId,
-          },
-        });
-
-        if (checkLikeResponse.data === true){
-          this.unlikePhoto(photo);
+        const checkLikeResponse = await this.checkLiked(photo);
+        console.log(checkLikeResponse);
+        if (checkLikeResponse == true){
+          await this.unlikePhoto(photo);
         } else {
           const response = await this.$axios.post(`${this.$url}/user/${this.userId}/likes/${photo.Id}`, null, {
             headers: {
@@ -446,6 +442,22 @@ export default {
         }
       } catch (error) {
         console.error('Error liking photo:', error);
+      }
+    },
+
+    async checkLiked(photo){
+      try {
+        const response = await this.$axios.get(`${this.$url}/users/${this.userId}/likes/${photo.Id}`, {
+          headers: { Authorization: 'Bearer ' + this.userId },
+        });
+        console.log(response.data);
+        if(response.data === true){
+          return true;
+        }
+        return false;
+      }
+      catch (error) {
+        console.error('Error checking like:', error);
       }
     },
 
