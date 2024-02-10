@@ -16,6 +16,7 @@ export default {
       selectedPhoto: null,
       loadingComments: false,
       newCommentText: '',
+      newUsername: '',
     }
   },
 
@@ -98,6 +99,23 @@ export default {
 
       if (searchInput && autocompleteList && !searchInput.contains(event.target) && !autocompleteList.contains(event.target)) {
         this.autocompleteResults = [];
+      }
+    },
+
+    async setMyUserName() {
+      try {
+        const response = await this.$axios.put(`${this.$url}/user/${this.userId}`, JSON.stringify(this.newUsername), {
+          headers: { Authorization: 'Bearer ' + this.userId },
+        });
+
+        if (response.status === 201) {
+          await this.getUserProfile();
+        } else {
+          console.error('Error changing username:', response.status, response.data);
+        }
+
+      } catch (error) {
+        console.error('Error changing username:', error);
       }
     },
 
@@ -414,7 +432,7 @@ export default {
           });
 
           if (response.status === 201) {
-            await this.getMyStream();
+            await this.getUserProfile();
           } else {
             console.error('Error liking photo:', response.status, response.data);
           }
@@ -494,6 +512,10 @@ export default {
             <button v-if="!isCurrentUser && !IsBanned" @click="banUser" class="btn btn-danger">Ban</button>
             <input type="file" ref="fileInput" @change="handleFileChange" style="display: none">
             <button v-if="isCurrentUser" @click="openFileInput" class="btn btn-success">Carica Foto</button>
+            <div class="new-comment-container" v-if="isCurrentUser">
+              <input v-model="newUsername" type="text" placeholder="Nuovo Username">
+              <button @click="setMyUserName()" class="btn btn-primary btn-follow">Cambia</button>
+            </div>
           </div>
           <div class="scrollable-list">
             <div v-for="photo in userProfile.Photos" :key="photo.Id" class="mb-4" :class="{ 'post-bigger': showComments }">
@@ -686,6 +708,7 @@ export default {
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+  border-radius: 5px;
 }
 
 .btn-delete{
