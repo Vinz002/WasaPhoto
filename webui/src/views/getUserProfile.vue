@@ -190,14 +190,9 @@ export default {
       if (this.userId === this.profileId) {
         this.isCurrentUser = true;
       } else {
-        const bancheck = await this.$axios.get(`${this.$url}/users/${this.userId}/bans/${this.profileId}`, {
-          headers: {
-            Authorization: 'Bearer ' + this.userId,
-          },
-        });
-
-        console.log(bancheck.data);
-        if (!bancheck.data) {
+        const bancheck = await this.checkBanned();
+        console.log(bancheck);
+        if (!bancheck) {
             this.IsBanned = false;
             const followStatusResponse = await this.$axios.get(`${this.$url}/users/${this.userId}/follows/${this.profileId}`, {
               headers: {
@@ -216,6 +211,23 @@ export default {
         console.error('Error fetching user profile:', error);
         this.errorMessage = 'Unable to fetch user profile';
       }
+    },
+
+    async checkBanned(){
+      try {
+        const response = await this.$axios.get(`${this.$url}/users/${this.userId}/bans/${this.profileId}`, {
+          headers: { Authorization: 'Bearer ' + this.userId },
+        });
+        console.log(response.data);
+        if(response.data === true){
+          return true;
+        }
+        return false;
+      }
+      catch (error) {
+        console.error('Error checking ban:', error);
+      }
+
     },
 
     async fetchUserProfileOnRouteChange() {
