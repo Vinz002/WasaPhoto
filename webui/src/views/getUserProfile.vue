@@ -514,7 +514,7 @@ export default {
             <button v-if="isCurrentUser" @click="openFileInput" class="btn btn-success">Carica Foto</button>
             <div class="new-comment-container" v-if="isCurrentUser">
               <input v-model="newUsername" type="text" placeholder="Nuovo Username">
-              <button @click="setMyUserName()" class="btn btn-primary btn-follow">Cambia</button>
+              <button @click="setMyUserName" class="btn btn-primary btn-follow">Cambia</button>
             </div>
           </div>
           <div class="scrollable-list">

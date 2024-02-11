@@ -14,7 +14,7 @@ export default {
         async dologin() {
             this.errormsg = null;
             try {
-                let response = await this.$axios.post("/session", {
+                let response = await this.$axios.post(`${this.$url}/session`, {
                     username: this.username,
                 });
 

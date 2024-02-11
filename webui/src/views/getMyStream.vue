@@ -151,7 +151,7 @@ export default {
 
     },
 
-    async goToUserProfile(selectedUserId) {
+     async goToUserProfile(selectedUserId) {
       const userId = localStorage.getItem("Identifier");
       localStorage.setItem("ProfileId", selectedUserId);
       this.$router.push({ path: "/users/"+ userId +"/profile/" + selectedUserId });
