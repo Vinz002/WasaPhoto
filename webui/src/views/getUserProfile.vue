@@ -419,6 +419,9 @@ export default {
     },
 
     async likePhoto(photo) {
+      if(photo.UserID == this.userId){
+        return;
+      }
       try {
         const checkLikeResponse = await this.checkLiked(photo);
         console.log(checkLikeResponse);
@@ -520,9 +523,11 @@ export default {
           <div class="scrollable-list">
             <div v-for="photo in userProfile.Photos" :key="photo.Id" class="mb-4" :class="{ 'post-bigger': showComments }">
               <div class="post-header">
-              <span class="author-name">{{ userProfile.Username }}</span>
-              <button v-if="isCurrentUser" @click="deletePhoto(photo)" class="btn btn-danger btn-sm" style="align-self: flex-end;">Delete</button>
-              <p class="text-light small">Uploaded on: {{ photo.DateUploaded }}</p>
+                  <div style="flex-grow: 1;">
+                    <span class="author-name">{{ userProfile.Username }}</span>
+                    <p class="text-light small">Uploaded on: {{ photo.DateUploaded }}</p>
+                  </div>
+                  <button v-if="isCurrentUser" @click="deletePhoto(photo)" class="btn btn-danger btn-sm delete-post">Delete</button>
               </div>
               <img :src="getPhotoUrl(photo.ImageData)" class="img-fluid rounded" alt="Responsive image">
               <div class="post-details">
@@ -536,7 +541,7 @@ export default {
                   <div v-if="!loadingComments && selectedPhoto && selectedPhoto === photo" class="comment-list-container">
                     <div v-for="comment in selectedPhoto.Comments" :key="comment.Id" class="comment">
                       <span class="comment-author">{{ comment.Username }}</span>
-                      {{ comment.Comment }}
+                      <span class="comment-text">{{ comment.Comment }}</span>
                       <button v-if="comment.UserID == this.userId" @click="uncommentPhoto(comment)" class="btn btn-danger btn-sm btn-delete" title="Elimina il tuo commento">X</button>
                     </div>
                     <div class="new-comment-container">
@@ -617,14 +622,24 @@ export default {
 .post-header {
   background-color: #333;
   color: #fff;
-  padding: 10px;
+  padding: 10px 10px 0 10px;
   text-align: left;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .author-name {
   font-weight: bold;
+  flex-grow: 1;
+  align-self: flex-start;
+}
+
+.delete-post{
+  flex-grow: 0;
+  flex-shrink: 0;
+  height: 80%;
 }
 
 .image {
@@ -667,7 +682,7 @@ export default {
 .comment-list-container {
   width: 300px;
   padding: 15px;
-  background-color: #fff;
+  background-color: #333;
   border: 1px solid #ddd;
   position: relative; /* Change from absolute to relative */
   margin-top: 10px; /* Add margin to position it below the post */
@@ -681,11 +696,27 @@ export default {
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.btn-delete{
+  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .comment-author {
+  flex-grow: 1;
   font-weight: bold;
   margin-right: 5px;
+  align-self: flex-start;
+}
+
+.comment-text {
+  flex-grow: 6;
+  align-self: flex-start;
+  text-align: left;
 }
 
 .post-bigger {
@@ -711,9 +742,6 @@ export default {
   border-radius: 5px;
 }
 
-.btn-delete{
-  align-items: right;
-  align-self: flex-end;
-}
+
 
 </style>
